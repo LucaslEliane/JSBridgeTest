@@ -1,0 +1,36 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>JSBridgeTest</title>
+    </head>
+    <body>
+        <h1>This is JSBridgeTest Application!</h1>
+        <button class="JSToNativeButton">JS 2 Native</button>
+        <script>
+            function setupWebViewJavascriptBridge(callback) {
+                if (window.WebViewJavascriptBridge) { return callback(WebViewJavascriptBridge); }
+                if (window.WVJBCallbacks) { return window.WVJBCallbacks.push(callback); }
+                window.WVJBCallbacks = [callback];
+                var WVJBIframe = document.createElement('iframe');
+                WVJBIframe.style.display = 'none';
+                WVJBIframe.src = 'https://__bridge_loaded__';
+                document.documentElement.appendChild(WVJBIframe);
+                setTimeout(function() { document.documentElement.removeChild(WVJBIframe) }, 0)
+            }
+            setupWebViewJavascriptBridge(function(bridge) {
+                /* Initialize your app here */
+                var button = document.querySelector(".JSToNativeButton");
+                button.addEventListener('click', function(event) {
+                    bridge.callHandler('JsToNative', "This is a message from javascript to native");
+                })
+                bridge.registerHandler('NativeToJs', function(data, responseCallback) {
+                    alert(data);
+                })
+                // bridge.callHandler('ObjC Echo', {'key':'value'}, function responseCallback(responseData) {
+                //     console.log("JS received response:", responseData)
+                // })
+            })
+        </script>
+    </body>
+</html>
